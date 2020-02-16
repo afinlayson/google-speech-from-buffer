@@ -70,7 +70,7 @@ class Speech {
     };
     return {
       audio: audio,
-      config: config,
+      config: this.config,
     };
   }
   
@@ -80,12 +80,13 @@ class Speech {
       const request = self.request(buffer);
 
       // Detects speech in the audio file
-      this.speechClient.recognize(request)
+      self.speechClient.recognize(request)
         .then((results) => {          
           return resolve(results);
         }).catch((err) => {
           return reject(err);
-      });
+        });
+    });
   }
  
   /**
@@ -107,7 +108,7 @@ class Speech {
       const request = self.request(buffer);
 
       // Detects speech in the audio file
-      this.speechClient.recognize(request)
+      self.speechClient.recognize(request)
         .then((results) => {
           if (typeof(results[0]) !== 'undefined' &&
               typeof(results[0].results[0]) !== 'undefined') {
