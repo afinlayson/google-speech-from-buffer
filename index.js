@@ -59,8 +59,35 @@ class Speech {
       console.log('> export GOOGLE_APPLICATION_CREDENTIALS=[json file]');
       process.exit(0);
     }
-  }
 
+    
+    this.speechClient = new GoogleCloudSpeech();
+  }
+  
+  request(buffer) {
+    let audio = {
+      content: buffer.toString('base64'),
+    };
+    return {
+      audio: audio,
+      config: config,
+    };
+  }
+  
+  recognize(buffer) {
+    let self = this;
+    return new Promise(function(resolve, reject) {
+      const request = self.request(buffer);
+
+      // Detects speech in the audio file
+      this.speechClient.recognize(request)
+        .then((results) => {          
+          return resolve(results);
+        }).catch((err) => {
+          return reject(err);
+      });
+  }
+ 
   /**
    * A promise when speech recognition is complete
    *
@@ -74,20 +101,13 @@ class Speech {
    * @param  {Buffer} buffer - Raw audio data from file or stream
    * @return {speechRecognitionPromise} A promise when recognition is complete
    */
-  recognize(buffer) {
+    recognizeString(buffer) {
     let self = this;
     return new Promise(function(resolve, reject) {
-      const audio = {
-        content: buffer.toString('base64'),
-      };
-      const request = {
-        audio: audio,
-        config: self.config,
-      };
+      const request = self.request(buffer);
 
       // Detects speech in the audio file
-      let speechClient = new GoogleCloudSpeech();
-      speechClient.recognize(request)
+      this.speechClient.recognize(request)
         .then((results) => {
           if (typeof(results[0]) !== 'undefined' &&
               typeof(results[0].results[0]) !== 'undefined') {
